@@ -53,15 +53,38 @@ void* client_handler(void* arg) {
         char sym_name[64];
         snprintf(sym_name, sizeof(sym_name), "%s_control", device); 
 
-        control_func_t control = (control_func_t)dlsym(handle, sym_name);
+        // SEG일 경우만 반환값을 받는 int 함수로 처리
+        if (strcasecmp(device, "seg") == 0) {
+            typedef int (*seg_func_t)(const char*);
+            seg_func_t seg_control = (seg_func_t)dlsym(handle, sym_name);
 
-        if (!control) {
-            fprintf(stderr, "dlsym 실패: %s\n", dlerror());
-            dlclose(handle);
-            continue;
+            if (!seg_control) {
+                fprintf(stderr, "dlsym 실패: %s\n", dlerror());
+                dlclose(handle);
+                continue;
+            }
+
+            int result = seg_control(buf);  // ✅ SEG 명령 실행 후 결과 반환
+
+            if (result == 1) {
+                const char* msg = "💤 잠에 들 시간이에요~\n";
+                write(client_fd, msg, strlen(msg));  // ✅ 알림 전송
+            }
+
+        } else {
+            // SEG가 아닌 다른 장치는 기존처럼 void로 실행
+            typedef void (*control_func_t)(const char*);
+            control_func_t control = (control_func_t)dlsym(handle, sym_name);
+
+            if (!control) {
+                fprintf(stderr, "dlsym 실패: %s\n", dlerror());
+                dlclose(handle);
+                continue;
+            }
+
+            control(buf);  // ✅ 명령 실행 (LED, BUZZER 등)
         }
 
-        control(buf);
         dlclose(handle);
     }
 

@@ -3,6 +3,6 @@
 #define SEG_H
 
 void seg_init();
-void seg_control(const char* cmd);
+int seg_control(const char* cmd);
 
 #endif
