@@ -53,6 +53,28 @@ void* client_handler(void* arg) {
         char sym_name[64];
         snprintf(sym_name, sizeof(sym_name), "%s_control", device); 
 
+        if (strcasecmp(device, "cds") == 0) {
+            typedef int (*cds_func_t)(const char*);
+            cds_func_t cds_control = (cds_func_t)dlsym(handle, sym_name);
+
+            if (!cds_control) {
+                fprintf(stderr, "dlsym 실패: %s\n", dlerror());
+                dlclose(handle);
+                continue;
+            }
+
+            int result = cds_control(buf);  // ✅ 조도 상태
+
+            if (result == 1) {
+                const char* msg = "🌑 앞이 안 보여요!\n";
+                write(client_fd, msg, strlen(msg));
+            } else if (result == 2) {
+                const char* msg = "🌞 너무 밝아요!\n";
+                write(client_fd, msg, strlen(msg));
+            }
+
+        }
+
         // SEG일 경우만 반환값을 받는 int 함수로 처리
         if (strcasecmp(device, "seg") == 0) {
             typedef int (*seg_func_t)(const char*);

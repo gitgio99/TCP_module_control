@@ -3,6 +3,6 @@
 #define CDS_H
 
 void cds_init();
-void cds_control(const char* cmd);
+int cds_control(const char* cmd);
 
 #endif
