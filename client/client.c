@@ -20,12 +20,13 @@ void print_menu() {
     printf("      • LED OFF      → 끄기 ❌\n");
 
     printf("\n  \e[1;32m🎵 BUZZER\e[0m\n");
-    printf("      • BUZZER ON1   → 🎶 동물의 숲 테마곡\n");
-    printf("      • BUZZER ON2   → 🎼 엘리제를 위하여\n");
+    printf("      • BUZZER ON1   → 🎶 동물의 숲 테마곡 (개발자 힐링곡)\n");
+    printf("      • BUZZER ON2   → 🎼 너의 이름은 - 황혼의 시간\n");
     printf("      • BUZZER OFF   → 🔇 부저 정지\n");
 
     printf("\n  \e[1;32m🌞 CDS SENSOR\e[0m\n");
-    printf("      • CDS READ     → 현재 밝기 측정 🔦\n");
+    printf("      • CDS READ     → 현재 밝기 측정 + LED 연동 🔦\n");
+    printf("      • CDS NOW      → 조도 상태만 빠르게 확인 📷\n");
 
     printf("\n  \e[1;32m🔢 SEGMENT DISPLAY\e[0m\n");
     printf("      • SEG <0~9>        → 숫자 표시 + 기본 카운트다운 ⏱️\n");
@@ -90,9 +91,8 @@ int validate_seg_command(const char* cmd) {
 }
 
 int validate_cds_command(const char* cmd) {
-    return strcasecmp(cmd, "CDS READ") == 0;
+    return strcasecmp(cmd, "CDS READ") == 0 || strcasecmp(cmd, "CDS NOW") == 0;
 }
-
 
 
 int main(int argc, char* argv[]) {
@@ -146,7 +146,7 @@ int main(int argc, char* argv[]) {
         }
 
         if (strncasecmp(buf, "CDS", 3) == 0 && !validate_cds_command(buf)) {
-            printf("\e[1;31m[CDS 명령 오류] 사용 예: CDS READ\e[0m\n");
+            printf("\e[1;31m[CDS 명령 오류] 사용 예: CDS READ / CDS NOW\e[0m\n");
             continue;
         }
 

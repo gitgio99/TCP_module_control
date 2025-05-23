@@ -54,47 +54,52 @@ int seg_control(const char* cmd) {
     char keyword[16];
     int value;
 
-    // SEG LED <value>
-    if (sscanf(cmd, "SEG %s %d", keyword, &value) == 2 && strcasecmp(keyword, "LED") == 0) {
-        if (value < 0 || value > 9) {
-            printf("잘못된 숫자입니다. 예: SEG LED 0~9\n");
-            return 3;
+    // SEG 명령 전체 블록
+    if (strncasecmp(cmd, "SEG", 3) == 0) {
+        // SEG LED <value>
+        if (sscanf(cmd, "SEG %s %d", keyword, &value) == 2 && strcasecmp(keyword, "LED") == 0) {
+            if (value < 0 || value > 9) {
+                printf("잘못된 숫자입니다. 예: SEG LED 0~9\n");
+                return 3;
+            }
+
+            printf("SEG LED %d → 카운트다운 + LED ON\n", value);
+            digitalWrite(LED3, HIGH);
+            for (int i = value; i >= 0; --i) {
+                display_number(i);
+                printf("표시 중: %d\n", i);
+                sleep(1);
+            }
+            digitalWrite(LED3, LOW);
+            printf("카운트다운 종료 → 대체 부저 울림\n");
+            play_buzzer_alt();
+            return 1;
         }
 
-        printf("SEG LED %d → 카운트다운 + LED ON\n", value);
-        digitalWrite(LED3, HIGH);
+        // SEG <value>
+        else if (sscanf(cmd, "SEG %d", &value) == 1) {
+            if (value < 0 || value > 9) {
+                printf("잘못된 숫자입니다. 예: SEG 0~9\n");
+                return 3;
+            }
 
-        for (int i = value; i >= 0; --i) {
-            display_number(i);
-            printf("표시 중: %d\n", i);
-            sleep(1);
+            printf("7세그먼트: %d부터 카운트다운 시작\n", value);
+            for (int i = value; i >= 0; --i) {
+                display_number(i);
+                printf("표시 중: %d\n", i);
+                sleep(1);
+            }
+            printf("카운트다운 종료 → 기본 부저 울림\n");
+            play_buzzer_alert();
+            return 2;
         }
 
-        digitalWrite(LED3, LOW);
-        printf("카운트다운 종료 → 대체 부저 울림\n");
-        play_buzzer_alt();
-        return 1; // ✅ LED 연동 → 클라이언트 알림 필요
+        // SEG but 잘못된 형식
+        else {
+            printf("잘못된 SEG 명령입니다. 예: SEG 5 / SEG LED 5\n");
+            return 4;
+        }
     }
 
-    // SEG <value> 기본
-    if (sscanf(cmd, "SEG %d", &value) == 1) {
-        if (value < 0 || value > 9) {
-            printf("잘못된 숫자입니다. 예: SEG 0~9\n");
-            return 3;
-        }
-
-        printf("7세그먼트: %d부터 카운트다운 시작\n", value);
-        for (int i = value; i >= 0; --i) {
-            display_number(i);
-            printf("표시 중: %d\n", i);
-            sleep(1);
-        }
-
-        printf("카운트다운 종료 → 기본 부저 울림\n");
-        play_buzzer_alert();
-        return 1; // ✅ 일반 SEG → 알림 불필요
-    }
-
-    // 예외 처리
-    printf("잘못된 SEG 명령입니다. 예: SEG 5 / SEG LED 5\n");
+    return 0;
 }
