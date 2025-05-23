@@ -11,8 +11,6 @@
 #include <dlfcn.h>
 #include <ctype.h>
 
-
-
 #define PORT 5200
 #define BUF_SIZE 256
 
@@ -108,7 +106,7 @@ void* client_handler(void* arg) {
         }
 
         // SEG일 경우만 반환값을 받는 int 함수로 처리
-        if (strcasecmp(device, "seg") == 0) {
+        else if (strcasecmp(device, "seg") == 0) {
             typedef int (*seg_func_t)(const char*);
             seg_func_t seg_control = (seg_func_t)dlsym(handle, sym_name);
 
@@ -158,35 +156,6 @@ void* client_handler(void* arg) {
                 write(client_fd, msg, strlen(msg));
             }
         }
-
-
-
-        
-        // if (strcasecmp(device, "buz") == 0) {
-        //     typedef int (*buz_func_t)(const char*);
-        //     buz_func_t buz_control = (buz_func_t)dlsym(handle, sym_name);
-
-        //     if (!buz_control) {
-        //         fprintf(stderr, "dlsym 실패: %s\n", dlerror());
-        //         dlclose(handle);
-        //         continue;
-        //     }
-
-        //     int result = buz_control(buf);  // ✅ BUZZER 명령 실행 및 리턴값 체크
-
-        //     // ✅ 음악별 클라이언트 메시지 전송
-        //     if (result == 1) {
-        //         const char* msg = "🍃 동물의 숲 재생 중... 개발자 힐링 타임입니다 🌿\n";
-        //         write(client_fd, msg, strlen(msg));
-        //     } else if (result == 2) {
-        //         const char* msg = "🌇 너의 이름은 - 황혼의 시간 🎵 감성 충전 완료!\n";
-        //         write(client_fd, msg, strlen(msg));
-        //     }
-        //     else if (result == 4) {
-        //         const char* msg = "🎵 재생이 종료되었습니다!\n";
-        //         write(client_fd, msg, strlen(msg));
-        //     }
-        // }
         
         else {
             // SEG가 아닌 다른 장치는 기존처럼 void로 실행
