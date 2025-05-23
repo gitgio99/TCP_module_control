@@ -94,35 +94,28 @@ void play_song(int* melody, int* duration, int count) {
 }
 
 
-// void play_song(int* melody, int* duration, int count) {
-//     for (int i = 0; i < count; ++i) {
-//         softToneWrite(BUZZER, melody[i]);
-//         usleep(duration[i] * 1000);
+
+// int buz_control(const char* cmd) {
+//     char action[16];
+//     sscanf(cmd, "BUZZER %s", action);
+
+//     if (strcasecmp(action, "ON1") == 0) {
+//         printf("BUZZER ON1: 동물의 숲 재생\n");
+//         play_song(melody1, duration1, note_count1);
+//         return 1;
+//     } else if (strcasecmp(action, "ON2") == 0) {
+//         printf("BUZZER ON2: 너의이름은 재생\n");
+//         play_song(melody2, duration2, note_count2);
+//         return 2;
+//     } else if (strcasecmp(action, "OFF") == 0) {
+//         softToneWrite(BUZZER, 0);
+//         printf("BUZZER OFF: 정지\n");
+//         return 4;
+//     } else {
+//         printf("잘못된 BUZZER 명령입니다. 예: BUZZER ON\n");
+//         printf("  BUZZER ON1  // 동물의 숲\n");
+//         printf("  BUZZER ON2  // 너의 이름은\n");
+//         printf("  BUZZER OFF\n");
+//         return 3;
 //     }
-//     softToneWrite(BUZZER, 0);
 // }
-
-int buz_control(const char* cmd) {
-    char action[16];
-    sscanf(cmd, "BUZZER %s", action);
-
-    if (strcasecmp(action, "ON1") == 0) {
-        printf("BUZZER ON1: 동물의 숲 재생\n");
-        play_song(melody1, duration1, note_count1);
-        return 1;
-    } else if (strcasecmp(action, "ON2") == 0) {
-        printf("BUZZER ON2: 너의이름은 재생\n");
-        play_song(melody2, duration2, note_count2);
-        return 2;
-    } else if (strcasecmp(action, "OFF") == 0) {
-        softToneWrite(BUZZER, 0);
-        printf("BUZZER OFF: 정지\n");
-        return 4;
-    } else {
-        printf("잘못된 BUZZER 명령입니다. 예: BUZZER ON\n");
-        printf("  BUZZER ON1  // 동물의 숲\n");
-        printf("  BUZZER ON2  // 너의 이름은\n");
-        printf("  BUZZER OFF\n");
-        return 3;
-    }
-}

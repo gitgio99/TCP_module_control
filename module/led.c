@@ -1,5 +1,4 @@
 // led.c
-
 #include <wiringPi.h>
 #include <softPwm.h>
 #include <string.h>
