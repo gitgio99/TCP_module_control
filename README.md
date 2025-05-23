@@ -16,28 +16,31 @@
 
 ## 📂 프로젝트 디렉토리 구조
 
-```bash
 FINAL_PROJECT/
 ├── README.md
-├── client/                    # 클라이언트 소스
-│   ├── client.c               # 명령어 입력, 유효성 검사, 서버 응답 수신
-│   └── makefile
+├── client/
+│ ├── client.c # 명령어 입력, 유효성 검사, 서버 응답 수신
+│ └── makefile
 │
-├── module/                    # 장치 제어 모듈 및 공유 라이브러리
-│   ├── buz.c / buz.h          # BUZZER (노래 재생 + 쓰레드)
-│   ├── cds.c / cds.h          # 조도센서 + LED 연동
-│   ├── led.c / led.h          # LED 밝기 조절
-│   ├── seg.c / seg.h          # 7세그먼트 숫자 표시 + 타이머
-│   ├── init_module.c / h      # 전체 장치 초기화
-│   ├── test / test.c          # 개별 장치 테스트용
-│   └── makefile               # .so 빌드 자동화
+├── module/
+│ ├── buz.c / buz.h # BUZZER (노래 재생 + 쓰레드)
+│ ├── cds.c / cds.h # 조도센서 + LED 연동
+│ ├── led.c / led.h # LED 밝기 조절
+│ ├── seg.c / seg.h # 7세그먼트 숫자 표시 + 타이머
+│ ├── init_module.c / h # 전체 장치 초기화
+│ ├── test / test.c # 개별 장치 테스트용
+│ └── makefile # .so 빌드 자동화
 │
-├── server/                    # 서버 소스
-│   ├── server.c               # 멀티스레드, daemon, signal 처리 포함
-│   ├── server.log             # 실행 로그 출력
-│   └── makefile
-🛠️ 실행 방법
-📌 사전 준비
+├── server/
+│ ├── server.c # 멀티스레드, daemon, signal 처리 포함
+│ ├── server.log # 실행 로그 출력
+│ └── makefile
+
+---
+
+### 🛠️ 실행 방법
+#### 🔧 사전 준비
+
 Raspberry Pi 4 + wiringPi 설치 필요
 
 각 모듈 GPIO 연결 필요 (핀 정보는 아래 참조)
