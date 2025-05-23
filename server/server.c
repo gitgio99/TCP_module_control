@@ -10,11 +10,21 @@
 #include <pthread.h>
 #include <dlfcn.h>
 #include <ctype.h>
+#include <signal.h>
+
 
 #define PORT 5200
 #define BUF_SIZE 256
 
 typedef void (*control_func_t)(const char*);
+
+int server_fd = -1; // 글로벌로 선언
+
+void sigint_handler(int signo) {
+    printf("[SIGINT] 서버 종료 시그널 수신!\n");
+    if (server_fd != -1) close(server_fd);
+    exit(0);
+}
 
 void* buzzer_thread(void* arg) {
     int* song = (int*)arg;
@@ -180,9 +190,12 @@ void* client_handler(void* arg) {
 
 
 int main() {
-    device_init();
-
     int server_fd;
+
+    signal(SIGINT, sigint_handler);  // ✅ SIGINT에 대한 핸들러 등록
+
+    device_init();
+    
     struct sockaddr_in serv_addr;
 
     server_fd = socket(AF_INET, SOCK_STREAM, 0);
