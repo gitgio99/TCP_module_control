@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 
-#define PORT 5200
+#define PORT 5300
 #define BUF_SIZE 256
 
 void print_menu() {

@@ -13,17 +13,43 @@
 #include <signal.h>
 
 
-#define PORT 5200
+#define PORT 5300
 #define BUF_SIZE 256
 
 typedef void (*control_func_t)(const char*);
 
+// FILE* log_file;
 int server_fd = -1; // 글로벌로 선언
 
 void sigint_handler(int signo) {
     printf("[SIGINT] 서버 종료 시그널 수신!\n");
     if (server_fd != -1) close(server_fd);
     exit(0);
+}
+
+void daemonize() {
+    pid_t pid;
+
+    // 1차 fork → 부모 종료
+    pid = fork();
+    if (pid < 0) exit(EXIT_FAILURE);
+    if (pid > 0) exit(EXIT_SUCCESS);  // 부모 종료
+
+    // 세션 리더 + 터미널 분리
+    if (setsid() < 0) exit(EXIT_FAILURE);
+
+    // 2차 fork → 세션 리더 방지
+    pid = fork();
+    if (pid < 0) exit(EXIT_FAILURE);
+    if (pid > 0) exit(EXIT_SUCCESS);
+
+    // 파일 권한 설정
+    umask(0);
+
+    // 루트 디렉토리로 이동 (보통 / 로 안전하게)
+    chdir("/");
+
+    close(STDIN_FILENO);  // stdin은 닫기
 }
 
 void* buzzer_thread(void* arg) {
@@ -77,7 +103,7 @@ void* client_handler(void* arg) {
             device[i] = tolower(device[i]);
 
         char lib_name[64];
-        snprintf(lib_name, sizeof(lib_name), "../module/lib%s.so", device);
+        snprintf(lib_name, sizeof(lib_name), "../module/lib%s.so", device); //"../module/lib%s.so" 상대경로
 
         void* handle = dlopen(lib_name, RTLD_LAZY);
         if (!handle) {
@@ -88,7 +114,31 @@ void* client_handler(void* arg) {
         char sym_name[64];
         snprintf(sym_name, sizeof(sym_name), "%s_control", device); 
 
-        if (strcasecmp(device, "cds") == 0) {
+        if (strcasecmp(device, "led") == 0) {
+            typedef int (*led_func_t)(const char*);
+            led_func_t led_control = (led_func_t)dlsym(handle, sym_name);
+
+            if (!led_control) {
+                fprintf(stderr, "dlsym 실패: %s\n", dlerror());
+                dlclose(handle);
+                continue;
+            }
+
+            int result = led_control(buf);  // ✅ LED 제어 후 상태 확인
+
+            const char* msg;
+            switch (result) {
+                case 1: msg = "🌞 최대 밝기입니다!\n"; break;
+                case 2: msg = "🌤️ 중간 밝기입니다!\n"; break;
+                case 4: msg = "🌙 최소 밝기입니다!\n"; break;
+                case 3: msg = "❌ LED가 꺼졌습니다!\n"; break;
+                default: msg = "⚠️ LED 명령이 올바르지 않습니다. (예: LED ON MAX)\n"; break;
+            }
+
+            write(client_fd, msg, strlen(msg));
+        }
+
+        else if (strcasecmp(device, "cds") == 0) {
             typedef int (*cds_func_t)(const char*);
             cds_func_t cds_control = (cds_func_t)dlsym(handle, sym_name);
 
@@ -195,9 +245,22 @@ int main() {
     signal(SIGINT, sigint_handler);  // ✅ SIGINT에 대한 핸들러 등록
 
     device_init();
+
+    // log_file = fopen("/home/iam/final_project/server/server.log", "a+");
+    // if (log_file) {
+    //     dup2(fileno(log_file), STDOUT_FILENO);
+    //     dup2(fileno(log_file), STDERR_FILENO);
+    //     setvbuf(log_file, NULL, _IOLBF, 0);  // 줄 단위 버퍼링
+    // } else {
+    // exit(1);  // 로그 파일조차 못 열면 종료
+    // }
+
+    // daemonize();
     
     struct sockaddr_in serv_addr;
 
+    // int opt = 1;
+    // setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));  // ✅ 추가
     server_fd = socket(AF_INET, SOCK_STREAM, 0);
     if (server_fd < 0) { perror("socket"); exit(1); }
 

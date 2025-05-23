@@ -3,6 +3,6 @@
 #define LED_H
 
 void led_init();
-void led_control(const char* cmd);
+int led_control(const char* cmd);
 
 #endif

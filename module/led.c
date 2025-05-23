@@ -14,7 +14,7 @@ void led_init() {
     softPwmCreate(LED_GPIO, 0, 255);  // 초기값 0, 범위 0~255
 }
 
-void led_control(const char* cmd) {
+int led_control(const char* cmd) {
     char action[16], level[16];
     int matched = sscanf(cmd, "LED %s %s", action, level);
 
@@ -22,18 +22,22 @@ void led_control(const char* cmd) {
         if (strcasecmp(level, "MAX") == 0) {
             softPwmWrite(LED_GPIO, 255);
             printf("LED ON MAX (255)\n");
+            return 1;
         } else if (strcasecmp(level, "MID") == 0) {
             softPwmWrite(LED_GPIO, 128);
             printf("LED ON MID (128)\n");
+            return 2;
         } else if (strcasecmp(level, "MIN") == 0) {
             softPwmWrite(LED_GPIO, 64);
             printf("LED ON MIN (64)\n");
+            return 4;
         } else {
             printf("잘못된 밝기 옵션입니다. (MAX/MID/MIN)\n");
         }
     } else if (strcasecmp(action, "OFF") == 0) {
         softPwmWrite(LED_GPIO, 0);
         printf("LED OFF\n");
+        return 3;
     } else {
         printf("잘못된 명령입니다. 사용 예: LED ON MAX / LED OFF\n");
     }
