@@ -188,33 +188,33 @@ void* client_handler(void* arg) {
         } 
 
         else if (strcasecmp(device, "buz") == 0) {
-        if (strcasecmp(buf, "BUZZER ON1") == 0 || strcasecmp(buf, "BUZZER ON2") == 0) {
-            buzzer_stop_flag = 0;
+            if (strcasecmp(buf, "BUZZER ON1") == 0 || strcasecmp(buf, "BUZZER ON2") == 0) {
+                buzzer_stop_flag = 0;
 
-            int* song = malloc(sizeof(int));
-            *song = (strcasecmp(buf, "BUZZER ON1") == 0) ? 1 : 2;
+                int* song = malloc(sizeof(int));
+                *song = (strcasecmp(buf, "BUZZER ON1") == 0) ? 1 : 2;
 
-            pthread_t tid;
-            pthread_create(&tid, NULL, buzzer_thread, song);
-            pthread_detach(tid);
+                pthread_t tid;
+                pthread_create(&tid, NULL, buzzer_thread, song);
+                pthread_detach(tid);
 
-            const char* msg = (*song == 1) ?
-                "🍃 동물의 숲 재생 중... 개발자 힐링 타임입니다 🌿\n" :
-                "🌇 너의 이름은 - 황혼의 시간 🎵 감성 충전 완료!\n";
-            write(client_fd, msg, strlen(msg));
-            } else if (strcasecmp(buf, "BUZZER OFF") == 0) {
-                buzzer_stop_flag = 1;           // ✅ stop_flag로 중단 유도
-                softToneWrite(27, 0);           // ✅ 즉시 부저 음 멈춤
-                const char* msg = "🎵 재생이 종료되었습니다!\n";
+                const char* msg = (*song == 1) ?
+                    "🍃 동물의 숲 재생 중... 개발자 힐링 타임입니다 🌿\n" :
+                    "🌇 너의 이름은 - 황혼의 시간 🎵 감성 충전 완료!\n";
                 write(client_fd, msg, strlen(msg));
-            } else {
-                const char* msg =
-                    "[BUZZER 명령 오류] 사용 예:\n"
-                    "  BUZZER ON1  // 동물의 숲\n"
-                    "  BUZZER ON2  // 너의 이름은\n"
-                    "  BUZZER OFF\n";
-                write(client_fd, msg, strlen(msg));
-            }
+                } else if (strcasecmp(buf, "BUZZER OFF") == 0) {
+                    buzzer_stop_flag = 1;           // ✅ stop_flag로 중단 유도
+                    softToneWrite(27, 0);           // ✅ 즉시 부저 음 멈춤
+                    const char* msg = "🎵 재생이 종료되었습니다!\n";
+                    write(client_fd, msg, strlen(msg));
+                } else {
+                    const char* msg =
+                        "[BUZZER 명령 오류] 사용 예:\n"
+                        "  BUZZER ON1  // 동물의 숲\n"
+                        "  BUZZER ON2  // 너의 이름은\n"
+                        "  BUZZER OFF\n";
+                    write(client_fd, msg, strlen(msg));
+                }
         }
         
         else {
