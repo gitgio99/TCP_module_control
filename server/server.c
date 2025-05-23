@@ -18,7 +18,7 @@
 
 typedef void (*control_func_t)(const char*);
 
-// FILE* log_file;
+FILE* log_file;
 int server_fd = -1; // 글로벌로 선언
 
 void sigint_handler(int signo) {
@@ -103,7 +103,7 @@ void* client_handler(void* arg) {
             device[i] = tolower(device[i]);
 
         char lib_name[64];
-        snprintf(lib_name, sizeof(lib_name), "../module/lib%s.so", device); //"../module/lib%s.so" 상대경로
+        snprintf(lib_name, sizeof(lib_name), "/home/iam/final_project/module/lib%s.so", device); //"../module/lib%s.so" 상대경로
 
         void* handle = dlopen(lib_name, RTLD_LAZY);
         if (!handle) {
@@ -246,16 +246,16 @@ int main() {
 
     device_init();
 
-    // log_file = fopen("/home/iam/final_project/server/server.log", "a+");
-    // if (log_file) {
-    //     dup2(fileno(log_file), STDOUT_FILENO);
-    //     dup2(fileno(log_file), STDERR_FILENO);
-    //     setvbuf(log_file, NULL, _IOLBF, 0);  // 줄 단위 버퍼링
-    // } else {
-    // exit(1);  // 로그 파일조차 못 열면 종료
-    // }
+    log_file = fopen("/home/iam/final_project/server/server.log", "a+");
+    if (log_file) {
+        dup2(fileno(log_file), STDOUT_FILENO);
+        dup2(fileno(log_file), STDERR_FILENO);
+        setvbuf(log_file, NULL, _IOLBF, 0);  // 줄 단위 버퍼링
+    } else {
+    exit(1);  // 로그 파일조차 못 열면 종료
+    }
 
-    // daemonize();
+    daemonize();
     
     struct sockaddr_in serv_addr;
 
