@@ -117,7 +117,8 @@ cd ../client
 * GCC 9.x
 * 사용 라이브러리: wiringPi, softTone, softPwm
 
-![Image](https://github.com/user-attachments/assets/b3a917f7-a0ac-4501-9e54-dd5405bb2ded)
+![image](https://github.com/user-attachments/assets/544d8557-a7a0-45ed-9f2c-43d8b6bcc37b)
+
 
 
 ---
